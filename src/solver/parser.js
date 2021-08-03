@@ -1,3 +1,4 @@
+import { forEachPieceCoord } from './piece';
 
 // const boardString = [
 //   'vb.v',
@@ -31,17 +32,24 @@ Example board:
   vssv
   .ss.
 */
-function parseBoard(boardString) {
+function parseBoard(boardStringRaw) {
+  // Remove extra whitespace
+  const boardString = boardStringRaw
+    .trim()
+    .split('\n')
+    .map(line => line.trim())
+    .join('\n');
   const lines = boardString.split('\n');
 
-  // check for line length consistency
-  const expectedWidth = boardString.length / lines.length;
+  // Check for line length consistency
+  // There are (lines.length - 1) number of new line chars, which we subtract
+  const expectedWidth = (boardString.length - (lines.length - 1 )) / lines.length;
   const linesAreSameLength = lines.every(x => x.length === expectedWidth);
   assert(linesAreSameLength, 'Lines are not same length!');
 
   const pieces = [];
   lines.forEach((line, y) => {
-    line.forEach((symbol, x) => {
+    line.split('').forEach((symbol, x) => {
       const type = PIECE_SYMBOL_TO_TYPE_MAP[symbol];
       assert(!!type, `Invalid symbol: ${symbol}`);
 
@@ -57,17 +65,11 @@ function parseBoard(boardString) {
     .map(_ => new Array(expectedWidth).fill(null));
 
   pieces.forEach(piece => {
-    const { type, pos } = piece;
-    for (let dy = 0; dy < type.height; dy++) {
-      for (let dx = 0; dx < type.width; dx++) {
-        const y = pos.y + dy;
-        const x = pos.x + dx;
-        assert(!grid[y][x], `Multiple pieces claim (x: ${x}, y: ${y})`);
-        grid[y][x] = piece;
-      }
-    }
+    forEachPieceCoord(piece, ({ x, y }) => {
+      assert(!grid[y][x], `Multiple pieces claim (x: ${x}, y: ${y})`);
+      grid[y][x] = piece;
+    });
   });
-
   return { pieces, grid };
 }
 
@@ -76,3 +78,5 @@ function assert(condition, msg) {
     throw new Error(msg);
   }
 }
+
+export { parseBoard };
