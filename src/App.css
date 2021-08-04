@@ -1,1 +1,24 @@
 
+.App {
+  padding: 30px;
+}
+
+.app-header {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
+
+.board {
+  border: 2px solid #998173;
+  background-color: #ffe3ce;
+}
+
+.pieces-wrap {
+  position: relative;
+}
+
+.piece {
+  position: absolute;
+  border: 1px solid #aa8f7b;
+  background-color: #e3c0a3;
+}

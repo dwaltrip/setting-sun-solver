@@ -1,6 +1,7 @@
 import './App.css';
 
 import { parseBoard } from './solver/parser';
+import { Board } from './Board';
 
 const exampleBoard = `
 vb.v
@@ -10,13 +11,13 @@ vssv
 .ss.
 `;
 
-const foo = parseBoard(exampleBoard);
-console.log(foo);
+const { pieces, grid } = parseBoard(exampleBoard);
 
 function App() {
   return (
     <div className='App'>
-      Foo Baz
+      <header className='app-header'>Setting Sun Solver</header>
+      <Board pieces={pieces} cols={4} rows={5}/>
     </div>
   );
 }
