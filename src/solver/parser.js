@@ -24,6 +24,13 @@ const PIECE_SYMBOL_TO_TYPE_MAP = {
   '.': BLANK_OR_NOT_TOP_LEFT_OF_PIECE,
 };
 
+const TYPE_NAME_TO_PIECE_SYMBOL_MAP = {
+  P_1X1_SQUARE: 's',
+  P_2X1_VERT: 'v',
+  P_2X1_HORIZ: 'h',
+  P_2X2_SQUARE: 'b',
+};
+
 /*
 Example board:
   vb.v
@@ -48,6 +55,7 @@ function parseBoard(boardStringRaw) {
   assert(linesAreSameLength, 'Lines are not same length!');
 
   const pieces = [];
+  let counter = 1;
   lines.forEach((line, y) => {
     line.split('').forEach((symbol, x) => {
       const type = PIECE_SYMBOL_TO_TYPE_MAP[symbol];
@@ -55,7 +63,9 @@ function parseBoard(boardStringRaw) {
 
       if (type !== BLANK_OR_NOT_TOP_LEFT_OF_PIECE) {
         // pos is the top left position of the piece
-        pieces.push({ type, pos: { x, y } });
+        // convert id to string as we will use it in object lookups later
+        pieces.push({ type, pos: { x, y }, id: `${counter}` });
+        counter += 1;
       }
     });
   });
@@ -79,4 +89,4 @@ function assert(condition, msg) {
   }
 }
 
-export { parseBoard };
+export { parseBoard, TYPE_NAME_TO_PIECE_SYMBOL_MAP };
