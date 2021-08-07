@@ -1,6 +1,7 @@
 import './App.css';
 
 import { parseBoard } from './solver/parser';
+import { solveBoard } from './solver/solver';
 import { Board } from './Board';
 
 const exampleBoard = `
@@ -11,7 +12,18 @@ vssv
 .ss.
 `;
 
-const { pieces, grid } = parseBoard(exampleBoard);
+const exampleBoard2 = `
+vvs.
+...s
+h.h.
+s.vv
+.s..
+`;
+
+solveBoard(exampleBoard2);
+
+// const { pieces, grid } = parseBoard(exampleBoard);
+// const { pieces, grid } = parseBoard(exampleBoard2);
 
 function App() {
   return (
