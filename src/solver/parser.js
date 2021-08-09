@@ -1,3 +1,4 @@
+import { assert } from "../lib/assert";
 import { forEachPieceCoord } from './piece';
 import { Board } from './board';
 
@@ -56,12 +57,6 @@ function parseBoard(boardStringRaw) {
     });
   });
   return new Board({ pieces, grid });
-}
-
-function assert(condition, msg) {
-  if (!condition) {
-    throw new Error(msg);
-  }
 }
 
 export { parseBoard };

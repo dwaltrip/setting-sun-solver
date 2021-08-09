@@ -20,9 +20,11 @@ s.vv
 .s..
 `;
 
-solveBoard(exampleBoard2);
 
-// const { pieces, grid } = parseBoard(exampleBoard);
+solveBoard(exampleBoard);
+const { pieces, grid } = parseBoard(exampleBoard);
+
+// solveBoard(exampleBoard2);
 // const { pieces, grid } = parseBoard(exampleBoard2);
 
 function App() {

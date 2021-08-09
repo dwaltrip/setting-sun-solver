@@ -1,3 +1,6 @@
+import { assert } from "../lib/assert";
+import { makeDupeFilter } from "../lib/make-dupe-filter";
+
 import { parseBoard } from './parser';
 import { Node } from './graph';
 
@@ -21,32 +24,37 @@ function solveBoard(boardString) {
     //   how to represent piece? with an ID?
     // ------------------------------------------
 
-
-    const seenNeighborCoords = {};
-    const nieghborCoords = gridCoords
+    // This removes movements with duplicate "piece", "direction" combos.
+    const excludeDupeMovements = makeDupeFilter(
+      ({ piece, direction: { dx, dy } }) => `(${piece.id},${dx},${dy})`,
+    );
+    const potentialMovements = gridCoords
       .filter(coord => board.getCoord(coord) === null)
+      // .filter(coord => board.isCoordEmpty(coord))
       .flatMap(coord => {
-        const nieghborCoords = board
+        return board
           .getNeighborCoords(coord)
-          // A set would be much better than this ugly filter. But I'm not
-          // being careful to ensure no dupe coord objects, which makes JS
-          // sets rather inconvenient, as they use object identity.
-          .filter(({ x, y }) => {
-            const key = `${x},${y}`;
-            if (key in seenNeighborCoords) {
-              return false;
-            }
-            seenNeighborCoords[key] = true;
-            return true;
-          });
-        return nieghborCoords;
+          .map(neighborCoord => board.getCoord(neighborCoord))
+          .filter(piece => !!piece)
+          .map(piece => {
+            return { piece, direction: getMovementVector(piece, coord) };
+          })
+          .filter(excludeDupeMovements);
       });
-    nieghborCoords.sort((a, b) => {
-      return (a.y - b.y) || (a.x - b.x);
+
+    potentialMovements.sort((m1, m2) => {
+      const pos1 = m1.piece.pos;
+      const pos2 = m2.piece.pos;
+      return (pos1.y - pos2.y) || (pos1.x - pos2.x);
     });
 
-    console.log('===== nieghborCoords');
-    nieghborCoords.forEach(c => console.log(c));
+    console.log('===== potentialMovements');
+    potentialMovements.forEach(({ piece: { pos }, direction: { dx, dy }}) => {
+      console.log(
+        `pos: { x: ${pos.x}, y: ${pos.y} } --`,
+        `dir: { dx: ${dx}, dy: ${dy} }`,
+      );
+    });
     console.log('--------------------');
   }
 
@@ -66,5 +74,40 @@ function solveBoard(boardString) {
 function listGridCoords(grid) {
   return grid.flatMap((row, y) => row.map((value, x) => ({ x, y })));
 }
+
+function getMovementVector(piece, coord) {
+  const topLeft = piece.pos;  
+  const { height, width } = piece.type;
+  const botRight = { x: piece.pos.x + (width - 1), y: piece.pos.y + (height - 1) };
+
+  const isMovingLeft = topLeft.x < coord.x && botRight.x < coord.x;
+  const isMovingRight = topLeft.x > coord.x && botRight.x > coord.x;
+  const isMovingUp = topLeft.y > coord.y && botRight.y > coord.y;
+  // positive y-direction on the board grid is "down"
+  const isMovingDown = topLeft.y < coord.y && botRight.y < coord.y;
+
+  const countTrueVals = (vals) => {
+    return vals.reduce((acc, val) => acc + Number(!!val), 0);
+  };
+  assert(
+    countTrueVals([isMovingDown, isMovingUp, isMovingLeft, isMovingRight]) === 1,
+    'Piece cannot move to given coord'
+  );
+
+  if (isMovingRight) {
+    return { dx: 1, dy: 0 };
+  }
+  if (isMovingLeft) {
+    return { dx: -1, dy: 0 };
+  }
+  if (isMovingDown) {
+    return { dx: 0, dy: 1 };
+  }
+  if (isMovingUp) {
+    return { dx: 0, dy: -1 };
+  }
+}
+
+// ---- Exports ----
 
 export { solveBoard };
