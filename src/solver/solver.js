@@ -7,12 +7,13 @@ import { Node } from './graph';
 
 function solveBoard(boardString) {
   const startingBoard = parseBoard(boardString);
-  const startingNode = new Node({ startingBoard });
-
-  const boardStringToNode = {};
-  boardStringToNode[startingBoard.stringRepr] = startingNode;
+  const startingNode = new Node({ board: startingBoard });
 
   const gridCoords = listGridCoords(startingBoard.grid);
+  const boardStringToNode = {};
+  const unvisitedNodes = [];
+
+  boardStringToNode[startingBoard.stringRepr] = startingNode; 
 
   function getMoves(board) {
     // This removes movements with duplicate "piece", "direction" combos.
@@ -35,7 +36,7 @@ function solveBoard(boardString) {
 
     // Exclude potential movements where the piece doesn't "fit",
     // as it clashes with some other piece.
-    const validMovements = potentialMovements.filter(
+    return potentialMovements.filter(
       ({ piece, direction: { dx, dy } }) => {
         const newCoords = getPieceCoords(piece).map(({ x, y }) => {
           return { x: x + dx, y: y + dy };
@@ -52,12 +53,55 @@ function solveBoard(boardString) {
         return !newCoords.some(coordContainsDifferentPiece);
       }
     );
-
   }
 
-  getMoves(startingBoard);
+  let currentNode = startingNode;
+  let done = false;
 
+  while (!done) {
+    const currentBoard = currentNode.board;
+    const moves = getMoves(currentBoard);
 
+    moves.forEach(move => {
+      const potentialNewBoard = currentBoard.applyMove(move);
+      const stringRepr = potentialNewBoard.stringRepr;
+
+      if (!(stringRepr in boardStringToNode)) {
+        const newNode = new Node({ board: potentialNewBoard });
+        boardStringToNode[stringRepr] = newNode;
+        unvisitedNodes.push(newNode);
+      }
+      const targetNode = boardStringToNode[stringRepr];
+
+      // Create edges between the nodes
+      const { piece, direction } = move;
+      currentNode.edges.push({
+        move: { startingPos: { ...piece.pos }, direction },
+        from: currentNode,
+        to: targetNode,
+      });
+      targetNode.edges.push({
+        move: {
+          startingPos: {
+            x: piece.pos.x + direction.dx,
+            y: piece.pos.y + direction.dy,
+          },
+          direction: { dx: -1 * direction.dx, dy: -1 * direction.dy },
+        },
+        from: targetNode,
+        to: currentNode,
+      });
+    });
+
+    if (unvisitedNodes.length === 0) {
+      done = true;
+    }
+    else {
+      currentNode = unvisitedNodes.pop();
+    }
+  }
+
+  return startingNode;
 }
 
 // ---- Helpers ----

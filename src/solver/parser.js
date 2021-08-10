@@ -1,5 +1,4 @@
 import { assert } from "../lib/assert";
-import { getPieceCoords } from './piece';
 import { Board } from './board';
 
 import {
@@ -46,17 +45,7 @@ function parseBoard(boardStringRaw) {
     });
   });
 
-  const grid = new Array(lines.length)
-    .fill(null)
-    .map(_ => new Array(expectedWidth).fill(null));
-
-  pieces.forEach(piece => {
-    getPieceCoords(piece).forEach(({ x, y }) => {
-      assert(!grid[y][x], `Multiple pieces claim (x: ${x}, y: ${y})`);
-      grid[y][x] = piece;
-    });
-  });
-  return new Board({ pieces, grid });
+  return new Board({ pieces, height: lines.length, width: expectedWidth });
 }
 
 export { parseBoard };
