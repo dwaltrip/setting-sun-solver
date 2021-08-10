@@ -15,16 +15,6 @@ function solveBoard(boardString) {
   const gridCoords = listGridCoords(startingBoard.grid);
 
   function getMoves(board) {
-    // step 1: iterate through grid looking for coords of empty spaces ("null")
-    // step 2: create list of pieces at all neighboring coords of emtpy spaces
-    // step 3: if piece can move into the empty space, add that movement to list
-    // step 4: return list of possible movements
-
-    // Todo:
-    //   how to represent movement? maybe just: { piece, direction }
-    //   how to represent piece? with an ID?
-    // ------------------------------------------
-
     // This removes movements with duplicate "piece", "direction" combos.
     const excludeDupeMovements = makeDupeFilter(
       ({ piece, direction: { dx, dy } }) => `(${piece.id},${dx},${dy})`,
@@ -63,30 +53,10 @@ function solveBoard(boardString) {
       }
     );
 
-    validMovements.sort((m1, m2) => {
-      const pos1 = m1.piece.pos;
-      const pos2 = m2.piece.pos;
-      return (pos1.y - pos2.y) || (pos1.x - pos2.x);
-    });
-
-    console.log('===== validMovements');
-    validMovements.forEach(({ piece: { pos }, direction: { dx, dy }}) => {
-      console.log(
-        `pos: { x: ${pos.x}, y: ${pos.y} } --`,
-        `dir: { dx: ${dx}, dy: ${dy} }`,
-      );
-    });
-    console.log('--------------------');
   }
 
   getMoves(startingBoard);
 
-  // const startingMoves = getMoves()
-  // const movesToTry = 
-  
-  // steps:
-  //    - [x] init graph. create lookup from board state string to node
-  //    - add initial....
 
 }
 
