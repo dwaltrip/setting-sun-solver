@@ -9,52 +9,10 @@ function solveBoard(boardString) {
   const startingBoard = parseBoard(boardString);
   const startingNode = new Node({ board: startingBoard });
 
-  const gridCoords = listGridCoords(startingBoard.grid);
   const boardStringToNode = {};
+  boardStringToNode[startingBoard.stringRepr] = startingNode;
+
   const unvisitedNodes = [];
-
-  boardStringToNode[startingBoard.stringRepr] = startingNode; 
-
-  function getMoves(board) {
-    // This removes movements with duplicate "piece", "direction" combos.
-    const excludeDupeMovements = makeDupeFilter(
-      ({ piece, direction: { dx, dy } }) => `(${piece.id},${dx},${dy})`,
-    );
-    const potentialMovements = gridCoords
-      .filter(coord => board.getCoord(coord) === null)
-      // .filter(coord => board.isCoordEmpty(coord))
-      .flatMap(coord => {
-        return board
-          .getNeighborCoords(coord)
-          .map(neighborCoord => board.getCoord(neighborCoord))
-          .filter(piece => !!piece)
-          .map(piece => {
-            return { piece, direction: getMovementVector(piece, coord) };
-          })
-          .filter(excludeDupeMovements);
-      });
-
-    // Exclude potential movements where the piece doesn't "fit",
-    // as it clashes with some other piece.
-    return potentialMovements.filter(
-      ({ piece, direction: { dx, dy } }) => {
-        const newCoords = getPieceCoords(piece).map(({ x, y }) => {
-          return { x: x + dx, y: y + dy };
-        });
-
-        function coordContainsDifferentPiece(coord) {
-          const anotherPieceMaybe = board.getCoord(coord);
-          if (anotherPieceMaybe === null) {
-            return false;
-          }
-          return anotherPieceMaybe.id !== piece.id;
-        }
-        // If any of new coords contain a different piece, the move is invalid.
-        return !newCoords.some(coordContainsDifferentPiece);
-      }
-    );
-  }
-
   let currentNode = startingNode;
   let done = false;
 
@@ -104,7 +62,49 @@ function solveBoard(boardString) {
   return startingNode;
 }
 
-// ---- Helpers ----
+function getMoves(board) {
+  // This removes movements with duplicate "piece", "direction" combos.
+  const excludeDupeMovements = makeDupeFilter(
+    ({ piece, direction: { dx, dy } }) => `(${piece.id},${dx},${dy})`,
+  );
+
+  // TODO: This doesn't need to be recomputed each time
+  const gridCoords = listGridCoords(board.grid);
+
+  const potentialMovements = gridCoords
+    .filter(coord => board.getCoord(coord) === null)
+    // .filter(coord => board.isCoordEmpty(coord))
+    .flatMap(coord => {
+      return board
+        .getNeighborCoords(coord)
+        .map(neighborCoord => board.getCoord(neighborCoord))
+        .filter(piece => !!piece)
+        .map(piece => {
+          return { piece, direction: getMovementVector(piece, coord) };
+        })
+        .filter(excludeDupeMovements);
+    });
+
+  // Exclude potential movements where the piece doesn't "fit",
+  // as it clashes with some other piece.
+  return potentialMovements.filter(
+    ({ piece, direction: { dx, dy } }) => {
+      const newCoords = getPieceCoords(piece).map(({ x, y }) => {
+        return { x: x + dx, y: y + dy };
+      });
+
+      function coordContainsDifferentPiece(coord) {
+        const anotherPieceMaybe = board.getCoord(coord);
+        if (anotherPieceMaybe === null) {
+          return false;
+        }
+        return anotherPieceMaybe.id !== piece.id;
+      }
+      // If any of new coords contain a different piece, the move is invalid.
+      return !newCoords.some(coordContainsDifferentPiece);
+    }
+  );
+}
 
 function listGridCoords(grid) {
   return grid.flatMap((row, y) => row.map((value, x) => ({ x, y })));
