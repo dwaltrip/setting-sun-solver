@@ -28,7 +28,7 @@ class Board {
   // TODO: this could be a iterator generator?
   getNeighborCoords({ x, y }) {
     return NEIGHBOR_VECTORS.reduce((memo, [dx, dy]) => {
-      const coord = { 'x': x + dx, 'y': y + dy };
+      const coord = { x: x + dx, y: y + dy };
       if (this.isValidCoord(coord)) {
         memo.push(coord);
       }

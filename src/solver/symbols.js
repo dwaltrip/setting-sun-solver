@@ -17,10 +17,10 @@ const PIECE_SYMBOL_TO_TYPE_MAP = {
 };
 
 const TYPE_NAME_TO_PIECE_SYMBOL_MAP = {
-  P_1X1_SQUARE: 's',
-  P_2X1_VERT: 'v',
-  P_2X1_HORIZ: 'h',
-  P_2X2_SQUARE: 'b',
+  [P_1X1_SQUARE]: 's',
+  [P_2X1_VERT]: 'v',
+  [P_2X1_HORIZ]: 'h',
+  [P_2X2_SQUARE]: 'b',
 };
 
 export {

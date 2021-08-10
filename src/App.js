@@ -20,12 +20,23 @@ s.vv
 .s..
 `;
 
+const exampleBoard3 = `
+vh.v
+.b..
+....
+vssv
+.ss.
+`;
 
-solveBoard(exampleBoard);
-const { pieces, grid } = parseBoard(exampleBoard);
+
+// solveBoard(exampleBoard);
+// const { pieces, grid } = parseBoard(exampleBoard);
 
 // solveBoard(exampleBoard2);
 // const { pieces, grid } = parseBoard(exampleBoard2);
+
+solveBoard(exampleBoard3);
+const { pieces, grid } = parseBoard(exampleBoard3);
 
 function App() {
   return (

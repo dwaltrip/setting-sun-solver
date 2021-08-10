@@ -2,6 +2,7 @@ import { assert } from "../lib/assert";
 import { makeDupeFilter } from "../lib/make-dupe-filter";
 
 import { parseBoard } from './parser';
+import { getPieceCoords } from './piece';
 import { Node } from './graph';
 
 function solveBoard(boardString) {
@@ -42,14 +43,34 @@ function solveBoard(boardString) {
           .filter(excludeDupeMovements);
       });
 
-    potentialMovements.sort((m1, m2) => {
+    // Exclude potential movements where the piece doesn't "fit",
+    // as it clashes with some other piece.
+    const validMovements = potentialMovements.filter(
+      ({ piece, direction: { dx, dy } }) => {
+        const newCoords = getPieceCoords(piece).map(({ x, y }) => {
+          return { x: x + dx, y: y + dy };
+        });
+
+        function coordContainsDifferentPiece(coord) {
+          const anotherPieceMaybe = board.getCoord(coord);
+          if (anotherPieceMaybe === null) {
+            return false;
+          }
+          return anotherPieceMaybe.id !== piece.id;
+        }
+        // If any of new coords contain a different piece, the move is invalid.
+        return !newCoords.some(coordContainsDifferentPiece);
+      }
+    );
+
+    validMovements.sort((m1, m2) => {
       const pos1 = m1.piece.pos;
       const pos2 = m2.piece.pos;
       return (pos1.y - pos2.y) || (pos1.x - pos2.x);
     });
 
-    console.log('===== potentialMovements');
-    potentialMovements.forEach(({ piece: { pos }, direction: { dx, dy }}) => {
+    console.log('===== validMovements');
+    validMovements.forEach(({ piece: { pos }, direction: { dx, dy }}) => {
       console.log(
         `pos: { x: ${pos.x}, y: ${pos.y} } --`,
         `dir: { dx: ${dx}, dy: ${dy} }`,
