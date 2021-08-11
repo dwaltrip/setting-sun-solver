@@ -17,7 +17,7 @@ function solveBoard(boardString) {
   let done = false;
 
   while (!done) {
-    const currentBoard = currentNode.board;
+    const currentBoard = currentNode.data.board;
     const moves = getMoves(currentBoard);
 
     moves.forEach(move => {
@@ -115,8 +115,8 @@ function getMovementVector(piece, coord) {
   const { height, width } = piece.type;
   const botRight = { x: piece.pos.x + (width - 1), y: piece.pos.y + (height - 1) };
 
-  const isMovingLeft = topLeft.x < coord.x && botRight.x < coord.x;
-  const isMovingRight = topLeft.x > coord.x && botRight.x > coord.x;
+  const isMovingLeft = topLeft.x > coord.x && botRight.x > coord.x;
+  const isMovingRight = topLeft.x < coord.x && botRight.x < coord.x;
   const isMovingUp = topLeft.y > coord.y && botRight.y > coord.y;
   // positive y-direction on the board grid is "down"
   const isMovingDown = topLeft.y < coord.y && botRight.y < coord.y;
