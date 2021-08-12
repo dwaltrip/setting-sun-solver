@@ -5,6 +5,8 @@ import { parseBoard } from './parser';
 import { getPieceCoords } from './piece';
 import { Node } from './graph';
 
+let counter = 0;
+
 function solveBoard(boardString) {
   const startingBoard = parseBoard(boardString);
   const startingNode = new Node({ board: startingBoard });
@@ -17,6 +19,7 @@ function solveBoard(boardString) {
   let done = false;
 
   while (!done) {
+    counter += 1;
     const currentBoard = currentNode.data.board;
     const moves = getMoves(currentBoard);
 
@@ -59,7 +62,8 @@ function solveBoard(boardString) {
     }
   }
 
-  return startingNode;
+  console.log('num nodes:', Object.keys(boardStringToNode).length);
+  return { startingNode, nodeLookup: boardStringToNode };
 }
 
 function getMoves(board) {
