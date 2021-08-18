@@ -53,11 +53,11 @@ console.log('solutionCounter:', solutionCounter);
 
 function Experimenting() {
   return (
-    <Board pieces={board.pieces} cols={board.width} rows={board.height}/>
-    // <PlaybackSolution
-    //   solutionPath={solutionPath}
-    //   nodeLookup={nodeLookup}
-    // />
+    // <Board pieces={board.pieces} cols={board.width} rows={board.height}/>
+    <PlaybackSolution
+      solutionPath={solutionPath}
+      nodeLookup={nodeLookup}
+    />
   );
 };
 

@@ -1,29 +1,49 @@
 import { useEffect, useState } from 'react';
 
+import { buildSafeSetState } from '../lib/build-safe-set-state';
 import { Board } from './board';
 
 function PlaybackSolution({ nodeLookup, solutionPath }) {
-  const [node, setNode] = useState(() => {
-    console.log('PlaybackSolution -- initing node state');
-    return nodeLookup[solutionPath.shift()];
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [moveIndex, setMoveIndex] = useState(0);
+
+  const setMoveIndexSafely = buildSafeSetState({
+    isValid: val => (0 <= val) && (val <= (solutionPath.length - 1)),
+    setState: setMoveIndex,
   });
-  const [counter, setCounter] = useState(1);
 
   useEffect(() => {
-    const id = setInterval(() => {
-      const nextNode = nodeLookup[solutionPath.shift()];
-      if (nextNode) {
-        setCounter(counter + 1);
-        setNode(nextNode);
+    const intervalId = setInterval(() => {
+      if (isPlaying) {
+        setMoveIndexSafely(moveIndex + 1);
       }
-    }, 850);
-    return () => clearInterval(id);
-  }, [node]);
+    }, 1000);
+    return () => clearInterval(intervalId);
+  }, [isPlaying, moveIndex]);
 
+  const node = nodeLookup[solutionPath[moveIndex]];
   const pieces = node.data.board.pieces;
+
   return (
     <>
-      <header className='app-header'>Move: {counter}</header>
+      <header className='app-header'>Move: {moveIndex}</header>
+      <div className='playback-controls'>
+        <button onClick={()=> setIsPlaying(!isPlaying)} >
+          {isPlaying ? 'Pause' : 'Play'}
+        </button>
+        <button
+          onClick={() => setMoveIndexSafely(prev => prev - 1)}
+          disabled={moveIndex <= 0}
+        >
+          Back
+        </button>
+        <button
+          onClick={() => setMoveIndexSafely(prev => prev + 1)}
+          disabled={moveIndex >= (solutionPath.length - 1)}
+        >
+          Forward
+        </button>
+      </div>
       <Board pieces={pieces} cols={4} rows={5}/>
     </>
   );
