@@ -4,13 +4,22 @@ import { buildSafeSetState } from '../lib/build-safe-set-state';
 import { Board } from './board';
 
 function PlaybackSolution({ nodeLookup, solutionPath }) {
+  const lastMoveIndex = solutionPath.length - 1;
+
   const [isPlaying, setIsPlaying] = useState(false);
   const [moveIndex, setMoveIndex] = useState(0);
 
   const setMoveIndexSafely = buildSafeSetState({
-    isValid: val => (0 <= val) && (val <= (solutionPath.length - 1)),
+    isValid: val => (0 <= val) && (val <= lastMoveIndex),
     setState: setMoveIndex,
   });
+
+  const increaseMoveIndexBy10 = () => {
+    setMoveIndexSafely(prev => Math.min(prev + 10, lastMoveIndex));
+  };
+  const decreaseMoveIndexBy10 = () => {
+    setMoveIndexSafely(prev => Math.max(0, prev - 10));
+  };
 
   useEffect(() => {
     const intervalId = setInterval(() => {
@@ -32,6 +41,15 @@ function PlaybackSolution({ nodeLookup, solutionPath }) {
           {isPlaying ? 'Pause' : 'Play'}
         </button>
         <button
+          onClick={() => setMoveIndexSafely(0)}
+          disabled={moveIndex <= 0}
+        >
+          Jump to first
+        </button>
+        <button onClick={decreaseMoveIndexBy10} disabled={moveIndex <= 0}>
+          Back++
+        </button>
+        <button
           onClick={() => setMoveIndexSafely(prev => prev - 1)}
           disabled={moveIndex <= 0}
         >
@@ -39,9 +57,21 @@ function PlaybackSolution({ nodeLookup, solutionPath }) {
         </button>
         <button
           onClick={() => setMoveIndexSafely(prev => prev + 1)}
-          disabled={moveIndex >= (solutionPath.length - 1)}
+          disabled={moveIndex >= lastMoveIndex}
         >
           Forward
+        </button>
+        <button
+          onClick={increaseMoveIndexBy10}
+          disabled={moveIndex >= lastMoveIndex}
+        >
+          Forward++
+        </button>
+        <button
+          onClick={() => setMoveIndexSafely(lastMoveIndex)}
+          disabled={moveIndex >= lastMoveIndex}
+        >
+          Jump to end
         </button>
       </div>
       <Board pieces={pieces} cols={4} rows={5}/>
