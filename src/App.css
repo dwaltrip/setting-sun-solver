@@ -21,4 +21,13 @@
   position: absolute;
   border: 1px solid #aa8f7b;
   background-color: #e3c0a3;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.piece .bg-color {
+  border-radius: 50%;
+  border: 1px solid #ccc;
 }
