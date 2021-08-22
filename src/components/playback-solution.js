@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react';
 import { buildSafeSetState } from '../lib/build-safe-set-state';
 import { Board } from './board';
 
+// TODO: "pause" playback when any of the other controls are pressed 
+// e.g. When "Forward" is clicked, the auto playback should pause.
 function PlaybackSolution({ nodeLookup, solutionPath }) {
   const lastMoveIndex = solutionPath.length - 1;
 

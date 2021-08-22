@@ -32,6 +32,28 @@ console.log('-----------')
 console.log(solutionPath);
 console.log('-----------')
 
+// NOTE: Due to how the graph is constructed, one move on the solution path
+// may take us between Board objects that have multiple piece objects in
+// different positions, when visually only one piece has moved. This is
+// because we didn't originally traverse the position space that way, and so
+// one of the board positions has visually identical pieces swapped with
+// respect to other board position.
+// This issue only became apparent when I tried to animate the movements
+// using CSS transition. On some moves, multiple pieces would move.
+// This code rebuilds the Board objects so that only the correct single
+// piece object is in a different position, just how it looks visually.
+for (let i=0; i < (solutionPath.length - 1); i++) {
+  const node = nodeLookup[solutionPath[i]];
+  const nextNode = nodeLookup[solutionPath[i+1]];
+  const edge = node.edges.filter(e => e.to === nextNode)[0];
+
+  const move = {
+    piece: node.data.board.getCoord(edge.move.startingPos),
+    direction: edge.move.direction,
+  };
+  nextNode.data.board = node.data.board.applyMove(move);
+}
+
 let solutionCounter = 0;
 for (let node of Object.values(nodeLookup)) {
   const board = node.data.board;

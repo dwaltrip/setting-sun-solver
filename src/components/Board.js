@@ -59,7 +59,7 @@ function Board({ pieces, rows, cols }) {
                 height: `${height}px`,
                 width: `${width}px`,
               }}
-              key={`${type.name} -- ${index}`}
+              key={piece.id}
             >
               <div
                 className='bg-color'
